@@ -29,6 +29,22 @@ max_flatbuffer_size = 256
 facade_tensor_constant = true
 
 [[tracker]]
+name = "soma_body_pose_v0"
+table = "SomaBodyPoseV0"
+schema = "soma_body_v0"
+class = "SomaBodyPoseV0Tracker"
+traits = "SomaBodyPoseV0RecordingTraits"
+max_flatbuffer_size = 2048
+
+[[tracker]]
+name = "soma_hand_pose_v0"
+table = "SomaHandPoseV0"
+schema = "soma_hand_v0"
+class = "SomaHandPoseV0Tracker"
+traits = "SomaHandPoseV0RecordingTraits"
+max_flatbuffer_size = 1024
+
+[[tracker]]
 name = "oglo_tactile"
 table = "OgloGloveSample"
 channel = "oglo"

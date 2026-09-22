@@ -1,0 +1,21 @@
+// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+include "point.fbs";
+
+namespace core;
+
+// Hand side shared by the SOMA pose transport schemas.
+enum SomaHandednessV0 : uint8 {
+    UNSPECIFIED = 0,
+    LEFT = 1,
+    RIGHT = 2,
+}
+
+// One SOMA axis-angle rotation in radians and its tracking validity.
+//
+// Versioned body and hand profiles define the joint order and reference frame.
+struct SomaJointRotationV0 {
+    axis_angle: Point;
+    is_valid: bool;
+}
