@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 """Utility nodes for the retargeting engine - transform, coordinate conversion, etc."""
@@ -6,6 +6,7 @@
 from .head_transform import HeadTransform
 from .controller_transform import ControllerTransform
 from .hand_transform import HandTransform
+from .soma_body_evaluator import SomaBodyEvaluator
 from .transform_utils import (
     validate_transform_matrix,
     decompose_transform,
@@ -20,6 +21,7 @@ __all__ = [
     "HeadTransform",
     "ControllerTransform",
     "HandTransform",
+    "SomaBodyEvaluator",
     # Utility functions
     "validate_transform_matrix",
     "decompose_transform",

@@ -15,6 +15,8 @@ add_executable(schema_tests
   test_joint_se3_pose.cpp
   test_se3_tracker.cpp
   test_serialized.cpp
+  test_soma_body_v0.cpp
+  test_soma_hand_v0.cpp
   test_schema_conform.cpp
 )
 target_link_libraries(schema_tests PRIVATE

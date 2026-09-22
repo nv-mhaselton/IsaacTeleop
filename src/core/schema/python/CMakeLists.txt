@@ -18,6 +18,9 @@ pybind11_add_module(schema_py
     schema_array_views.h
     schema_serialized.h
     se3_tracker_bindings.h
+    soma_common_v0_bindings.h
+    soma_body_v0_bindings.h
+    soma_hand_v0_bindings.h
     schema_module.cpp
 )
 

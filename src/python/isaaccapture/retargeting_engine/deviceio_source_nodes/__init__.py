@@ -13,6 +13,7 @@ from .controllers_source import ControllersSource
 from .pedals_source import Generic3AxisPedalSource
 from .joint_state_source import JointStateSource
 from .full_body_source import FullBodySource
+from .soma_body_source import SomaBodySource
 from .message_channel_source import MessageChannelSource
 from .message_channel_sink import MessageChannelSink
 from .message_channel_config import (
@@ -28,12 +29,14 @@ from .deviceio_tensor_types import (
     Generic3AxisPedalOutputTrackedType,
     JointStateOutputTrackedType,
     FullBodyPoseTrackedType,
+    SomaBodyPoseV0TrackedType,
     DeviceIOHeadPoseTracked,
     DeviceIOHandPoseTracked,
     DeviceIOControllerSnapshotTracked,
     DeviceIOGeneric3AxisPedalOutputTracked,
     DeviceIOJointStateOutputTracked,
     DeviceIOFullBodyPoseTracked,
+    DeviceIOSomaBodyPoseV0Tracked,
     MessageChannelMessagesTrackedType,
     MessageChannelConnectionStatus,
     MessageChannelStatusType,
@@ -51,6 +54,7 @@ __all__ = [
     "Generic3AxisPedalSource",
     "JointStateSource",
     "FullBodySource",
+    "SomaBodySource",
     "MessageChannelSource",
     "MessageChannelSink",
     "MessageChannelConfig",
@@ -63,6 +67,7 @@ __all__ = [
     "Generic3AxisPedalOutputTrackedType",
     "JointStateOutputTrackedType",
     "FullBodyPoseTrackedType",
+    "SomaBodyPoseV0TrackedType",
     "MessageChannelMessagesTrackedType",
     "MessageChannelConnectionStatus",
     "MessageChannelStatusType",
@@ -72,6 +77,7 @@ __all__ = [
     "DeviceIOGeneric3AxisPedalOutputTracked",
     "DeviceIOJointStateOutputTracked",
     "DeviceIOFullBodyPoseTracked",
+    "DeviceIOSomaBodyPoseV0Tracked",
     "DeviceIOMessageChannelMessagesTracked",
     "MessageChannelMessagesTrackedGroup",
     "MessageChannelStatusGroup",

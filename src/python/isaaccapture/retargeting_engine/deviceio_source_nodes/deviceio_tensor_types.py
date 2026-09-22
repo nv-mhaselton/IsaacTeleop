@@ -21,6 +21,7 @@ from isaaccapture.schema import (
     Generic3AxisPedalOutput,
     JointStateOutput,
     FullBodyPose,
+    SomaBodyPoseV0,
     MessageChannelMessagesTracked,
 )
 
@@ -108,6 +109,12 @@ class FullBodyPoseTrackedType(_PayloadTensorType):
     _payload_cls = FullBodyPose
 
 
+class SomaBodyPoseV0TrackedType(_PayloadTensorType):
+    """SomaBodyPoseV0 payload from a generated SOMA body tracker."""
+
+    _payload_cls = SomaBodyPoseV0
+
+
 class MessageChannelMessagesTrackedType(_RequiredPayloadTensorType):
     """MessageChannelMessagesTracked batch from DeviceIO MessageChannelTracker."""
 
@@ -193,6 +200,14 @@ def DeviceIOFullBodyPoseTracked() -> TensorGroupType:
     return TensorGroupType(
         "deviceio_full_body_pose",
         [FullBodyPoseTrackedType("full_body_tracked")],
+    )
+
+
+def DeviceIOSomaBodyPoseV0Tracked() -> TensorGroupType:
+    """SOMA V0 body controls, or None when the tracker is inactive."""
+    return TensorGroupType(
+        "deviceio_soma_body_pose_v0",
+        [SomaBodyPoseV0TrackedType("soma_body_tracked")],
     )
 
 

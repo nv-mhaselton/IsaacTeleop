@@ -1,0 +1,24 @@
+// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+include "quaternion.fbs";
+
+namespace core;
+
+// Hand side shared by the SOMA pose transport schemas.
+enum SomaHandednessV0 : uint8 {
+    UNSPECIFIED = 0,
+    LEFT = 1,
+    RIGHT = 2,
+}
+
+// One SOMA rotation and its tracking validity.
+//
+// Versioned body and hand profiles define the joint order and reference frame.
+// Valid rotations are unit XYZW quaternions. q and -q represent the same
+// rotation; no quaternion-sign convention is required. Ignore rotation when
+// is_valid is false.
+struct SomaJointRotationV0 {
+    rotation: Quaternion;
+    is_valid: bool;
+}
