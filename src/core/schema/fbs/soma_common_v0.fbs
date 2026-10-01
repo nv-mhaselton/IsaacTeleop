@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-include "point.fbs";
+include "quaternion.fbs";
 
 namespace core;
 
@@ -12,10 +12,13 @@ enum SomaHandednessV0 : uint8 {
     RIGHT = 2,
 }
 
-// One SOMA axis-angle rotation in radians and its tracking validity.
+// One SOMA rotation and its tracking validity.
 //
 // Versioned body and hand profiles define the joint order and reference frame.
+// Valid rotations are unit XYZW quaternions. q and -q represent the same
+// rotation; no quaternion-sign convention is required. Ignore rotation when
+// is_valid is false.
 struct SomaJointRotationV0 {
-    axis_angle: Point;
+    rotation: Quaternion;
     is_valid: bool;
 }

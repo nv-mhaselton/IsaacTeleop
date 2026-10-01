@@ -126,13 +126,13 @@ inline void bind_soma_body_v0(py::module& m)
             },
             py::arg("index"), py::return_value_policy::reference_internal)
         .def_property_readonly(
-            "axis_angles",
+            "rotations",
             [](py::object self)
             {
-                const auto* first = reinterpret_cast<const float*>(&first_soma_body_v0_rotation(self).axis_angle());
-                return strided_field_view<float>(self, first, SOMA_BODY_JOINT_STRIDE, SOMA_BODY_JOINT_COUNT, 3);
+                const auto* first = reinterpret_cast<const float*>(&first_soma_body_v0_rotation(self).rotation());
+                return strided_field_view<float>(self, first, SOMA_BODY_JOINT_STRIDE, SOMA_BODY_JOINT_COUNT, 4);
             },
-            "Axis-angle rotations in radians as a writable (77, 3) float32 view.")
+            "Unit XYZW quaternions as a writable (77, 4) float32 view.")
         .def_property_readonly(
             "is_valid",
             [offset = FBS_FIELD_OFFSET(SomaJointRotationV0, is_valid)](py::object self)

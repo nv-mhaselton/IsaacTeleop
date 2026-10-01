@@ -5,7 +5,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
 #include <schema/soma_body_v0_generated.h>
+#include <schema/timestamp_generated.h>
 
+#include <cmath>
 #include <cstddef>
 #include <memory>
 #include <type_traits>
@@ -38,13 +40,14 @@ TEST_CASE("SOMA body v0 rotation array has the public layout", "[soma_body_v0][s
     core::SomaBodyJointRotationsV0 rotations;
 
     REQUIRE(rotations.values()->size() == static_cast<size_t>(core::SomaBodyJointV0_NUM_JOINTS));
-    CHECK((*rotations.values())[core::SomaBodyJointV0_HIPS]->axis_angle().x() == 0.0f);
+    CHECK((*rotations.values())[core::SomaBodyJointV0_HIPS]->rotation().x() == 0.0f);
     CHECK_FALSE((*rotations.values())[core::SomaBodyJointV0_RIGHT_TOE_END]->is_valid());
 
-    const core::SomaJointRotationV0 hips(core::Point(0.1f, 0.2f, 0.3f), true);
+    const core::SomaJointRotationV0 hips(core::Quaternion(0.0f, 0.0f, 0.6f, 0.8f), true);
     rotations.mutable_values()->Mutate(core::SomaBodyJointV0_HIPS, hips);
 
-    CHECK((*rotations.values())[core::SomaBodyJointV0_HIPS]->axis_angle().y() == Catch::Approx(0.2f));
+    CHECK((*rotations.values())[core::SomaBodyJointV0_HIPS]->rotation().z() == Catch::Approx(0.6f));
+    CHECK((*rotations.values())[core::SomaBodyJointV0_HIPS]->rotation().w() == Catch::Approx(0.8f));
     CHECK((*rotations.values())[core::SomaBodyJointV0_HIPS]->is_valid());
 }
 
@@ -53,7 +56,7 @@ TEST_CASE("SOMA body pose v0 round trips through FlatBuffers", "[soma_body_v0][f
     core::SomaBodyPoseV0T pose;
     pose.joint_rotations = std::make_shared<core::SomaBodyJointRotationsV0>();
     pose.joint_rotations->mutable_values()->Mutate(
-        core::SomaBodyJointV0_HEAD, core::SomaJointRotationV0(core::Point(0.4f, 0.5f, 0.6f), true));
+        core::SomaBodyJointV0_HEAD, core::SomaJointRotationV0(core::Quaternion(0.0f, 0.0f, 0.6f, 0.8f), true));
     pose.global_translation = std::make_shared<core::Point>(1.0f, 2.0f, 3.0f);
     pose.global_translation_is_valid = true;
 
@@ -64,8 +67,58 @@ TEST_CASE("SOMA body pose v0 round trips through FlatBuffers", "[soma_body_v0][f
     REQUIRE(decoded->joint_rotations() != nullptr);
     REQUIRE(decoded->global_translation() != nullptr);
     const auto* head = (*decoded->joint_rotations()->values())[core::SomaBodyJointV0_HEAD];
-    CHECK(head->axis_angle().z() == Catch::Approx(0.6f));
+    CHECK(head->rotation().z() == Catch::Approx(0.6f));
+    CHECK(head->rotation().w() == Catch::Approx(0.8f));
     CHECK(head->is_valid());
     CHECK(decoded->global_translation()->x() == Catch::Approx(1.0f));
     CHECK(decoded->global_translation_is_valid());
+}
+
+TEST_CASE("SOMA body record v0 preserves quaternion components and validity", "[soma_body_v0][flatbuffers]")
+{
+    const float scale = 1.0f / std::sqrt(30.0f);
+    core::SomaBodyPoseV0RecordT record;
+    record.data = std::make_shared<core::SomaBodyPoseV0T>();
+    record.data->joint_rotations = std::make_shared<core::SomaBodyJointRotationsV0>();
+    record.data->joint_rotations->mutable_values()->Mutate(
+        core::SomaBodyJointV0_HIPS,
+        core::SomaJointRotationV0(core::Quaternion(scale, -2.0f * scale, 3.0f * scale, -4.0f * scale), true));
+    record.data->joint_rotations->mutable_values()->Mutate(
+        core::SomaBodyJointV0_RIGHT_TOE_END,
+        core::SomaJointRotationV0(core::Quaternion(-scale, 2.0f * scale, -3.0f * scale, 4.0f * scale), true));
+    record.data->global_translation = std::make_shared<core::Point>(1.0f, -2.0f, 3.0f);
+    record.data->global_translation_is_valid = false;
+    record.timestamp = std::make_shared<core::DeviceDataTimestamp>(100, 200, 300);
+
+    flatbuffers::FlatBufferBuilder builder;
+    builder.Finish(core::SomaBodyPoseV0Record::Pack(builder, &record));
+    flatbuffers::Verifier verifier(builder.GetBufferPointer(), builder.GetSize());
+    REQUIRE(verifier.VerifyBuffer<core::SomaBodyPoseV0Record>(nullptr));
+
+    const auto* decoded = flatbuffers::GetRoot<core::SomaBodyPoseV0Record>(builder.GetBufferPointer());
+    REQUIRE(decoded->data() != nullptr);
+    REQUIRE(decoded->timestamp() != nullptr);
+    REQUIRE(decoded->data()->joint_rotations() != nullptr);
+    REQUIRE(decoded->data()->global_translation() != nullptr);
+    const auto* values = decoded->data()->joint_rotations()->values();
+    const auto* hips = (*values)[core::SomaBodyJointV0_HIPS];
+    const auto* toe = (*values)[core::SomaBodyJointV0_RIGHT_TOE_END];
+    CHECK(hips->rotation().x() == Catch::Approx(scale));
+    CHECK(hips->rotation().y() == Catch::Approx(-2.0f * scale));
+    CHECK(hips->rotation().z() == Catch::Approx(3.0f * scale));
+    CHECK(hips->rotation().w() == Catch::Approx(-4.0f * scale));
+    CHECK(toe->rotation().x() == Catch::Approx(-scale));
+    CHECK(toe->rotation().y() == Catch::Approx(2.0f * scale));
+    CHECK(toe->rotation().z() == Catch::Approx(-3.0f * scale));
+    CHECK(toe->rotation().w() == Catch::Approx(4.0f * scale));
+    CHECK(hips->is_valid());
+    CHECK(toe->is_valid());
+    CHECK_FALSE((*values)[core::SomaBodyJointV0_HEAD]->is_valid());
+    CHECK(decoded->data()->global_translation()->x() == Catch::Approx(1.0f));
+    CHECK(decoded->data()->global_translation()->y() == Catch::Approx(-2.0f));
+    CHECK(decoded->data()->global_translation()->z() == Catch::Approx(3.0f));
+    CHECK_FALSE(decoded->data()->global_translation_is_valid());
+    CHECK(decoded->timestamp()->available_time_local_common_clock() == 100);
+    CHECK(decoded->timestamp()->sample_time_local_common_clock() == 200);
+    CHECK(decoded->timestamp()->sample_time_raw_device_clock() == 300);
 }

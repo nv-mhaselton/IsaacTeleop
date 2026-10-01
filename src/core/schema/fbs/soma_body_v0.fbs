@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+include "point.fbs";
 include "soma_common_v0.fbs";
 include "timestamp.fbs";
 
@@ -8,7 +9,7 @@ namespace core;
 
 // User-facing SOMA-X body pose order. The public skeleton has 78 joints, but its
 // virtual Root is always identity and is not part of this array. Hips is index 0,
-// matching SOMALayer's (B, 77, 3) poses input.
+// matching SOMALayer's 77-entry public pose input.
 enum SomaBodyJointV0 : uint8 {
     HIPS = 0,
     SPINE1 = 1,
@@ -103,9 +104,9 @@ struct SomaBodyJointRotationsV0 {
 // Producers must convert historical, custom, or vendor-native references before
 // publishing. Hips is global in the reference frame; all remaining rotations are
 // joint-local relative to that fixed reference pose. A distinct vendor-native
-// root transform must be composed into Hips before publishing. Axis angles are
-// radians. Global translation is meters in a right-handed reference frame with
-// +Y up and +Z forward.
+// root transform must be composed into Hips before publishing. Rotations are
+// unit XYZW quaternions. Global translation is meters in a right-handed
+// reference frame with +Y up and +Z forward.
 table SomaBodyPoseV0 {
     joint_rotations: SomaBodyJointRotationsV0 (id: 0);
 

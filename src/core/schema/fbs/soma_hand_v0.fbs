@@ -1,12 +1,13 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+include "point.fbs";
 include "soma_common_v0.fbs";
 include "timestamp.fbs";
 
 namespace core;
 
-// SOMAHandLayer's (B, 25, 3) poses input order. These are the wrist and the
+// SOMAHandLayer's 25-entry public pose input order. These are the wrist and the
 // 24 finger joints that form a strict subset of the SOMA-X body skeleton.
 enum SomaHandJointV0 : uint8 {
     WRIST = 0,
@@ -49,9 +50,9 @@ struct SomaHandJointRotationsV0 {
 // with reference_pose=None, absolute_pose=False, and its public joint order.
 // Producers must convert historical, custom, or vendor-native references before
 // publishing. Wrist is global in the reference frame; finger rotations are
-// joint-local relative to that fixed reference pose. Axis angles are radians.
-// Global translation is meters in a right-handed reference frame with +Y up and
-// +Z forward.
+// joint-local relative to that fixed reference pose. Rotations are unit XYZW
+// quaternions. Global translation is meters in a right-handed reference frame
+// with +Y up and +Z forward.
 table SomaHandPoseV0 {
     joint_rotations: SomaHandJointRotationsV0 (id: 0);
 

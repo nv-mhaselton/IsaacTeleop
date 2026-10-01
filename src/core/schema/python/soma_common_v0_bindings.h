@@ -20,8 +20,8 @@ inline void bind_soma_common_v0(py::module& m)
 
     py::class_<SomaJointRotationV0>(m, "SomaJointRotationV0")
         .def(py::init<>())
-        .def(py::init<const Point&, bool>(), py::arg("axis_angle"), py::arg("is_valid") = false)
-        .def_property_readonly("axis_angle", &SomaJointRotationV0::axis_angle, py::return_value_policy::reference_internal)
+        .def(py::init<const Quaternion&, bool>(), py::arg("rotation"), py::arg("is_valid") = false)
+        .def_property_readonly("rotation", &SomaJointRotationV0::rotation, py::return_value_policy::reference_internal)
         .def_property_readonly("is_valid", &SomaJointRotationV0::is_valid);
 }
 

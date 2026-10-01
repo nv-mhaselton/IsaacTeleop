@@ -286,9 +286,14 @@ the virtual Root, which is always identity and is added internally by ``SOMALaye
 global rotation; the remaining rotations use SOMA-X v0.3.1 with ``reference_pose=None`` and
 ``absolute_pose=False``. Producers must convert historical, custom, or vendor-native references
 before publishing. If the native skeleton has a separate Root, the producer composes it into the
-global Hips pose. ``global_translation`` is applied to Hips and is measured in meters. The reference
-frame is right-handed with +Y up and +Z forward. Each pose control and the global translation have
-independent validity.
+global Hips pose. Rotations are unit XYZW quaternions; ``q`` and ``-q`` represent the same rotation,
+and the transport requires no quaternion-sign convention. ``global_translation`` is applied to Hips
+and is measured in meters. The reference frame is right-handed with +Y up and +Z forward. Each pose
+control and the global translation have independent validity.
+
+A SOMA-X consumer can convert the quaternion array with
+`soma.geometry.transforms.quaternion_xyzw_to_matrix <https://nvlabs.github.io/SOMA-X/stable/api/geometry.html>`__
+and pass the resulting matrices to ``SOMALayer.pose(..., pose2rot=False)``.
 
 The integration defines the reference frame and keeps it stable for the collection. To align this
 pose with another tracker, such as HMD full-body tracking, the producer transforms its native
@@ -297,7 +302,7 @@ tracking frame into the same physical reference frame before publishing.
 - Schemas: :code-file:`src/core/schema/fbs/soma_common_v0.fbs`, :code-file:`src/core/schema/fbs/soma_body_v0.fbs`
 - Manifest: :code-file:`src/core/deviceio_trackers/trackers.toml` (``soma_body_pose_v0``)
 - C++ header: ``#include <deviceio_trackers/soma_body_pose_v0_tracker.hpp>``
-- Python import: ``from isaacteleop.deviceio_trackers import SomaBodyPoseV0Tracker``
+- Python import: ``from isaaccapture.deviceio_trackers import SomaBodyPoseV0Tracker``
 - Record channels: ``soma_body_pose_v0``, ``soma_body_pose_v0_tracked`` | MCAP schema: ``core.SomaBodyPoseV0Record``
 - Tests:
 
@@ -308,7 +313,7 @@ SomaHandPoseV0Tracker
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Reads the matching SOMA hand pose transport schema v0, also defined and verified against SOMA-X
-v0.3.1 and its v0.3 pose interface. The payload contains 25 axis-angle rotations in
+v0.3.1 and its v0.3 pose interface. The payload contains 25 unit XYZW quaternions in
 ``SomaHandJointV0`` order. Wrist is the global rotation; the remaining rotations are joint-local
 relative to the same fixed v0.3.1 reference contract. ``global_translation`` is applied to Wrist and
 uses the same units and reference-frame convention as ``SomaBodyPoseV0``.
@@ -320,7 +325,7 @@ calling ``SchemaPusher``.
 - Schemas: :code-file:`src/core/schema/fbs/soma_common_v0.fbs`, :code-file:`src/core/schema/fbs/soma_hand_v0.fbs`
 - Manifest: :code-file:`src/core/deviceio_trackers/trackers.toml` (``soma_hand_pose_v0``)
 - C++ header: ``#include <deviceio_trackers/soma_hand_pose_v0_tracker.hpp>``
-- Python import: ``from isaacteleop.deviceio_trackers import SomaHandPoseV0Tracker``
+- Python import: ``from isaaccapture.deviceio_trackers import SomaHandPoseV0Tracker``
 - Record channels: ``soma_hand_pose_v0``, ``soma_hand_pose_v0_tracked`` | MCAP schema: ``core.SomaHandPoseV0Record``
 - Tests:
 
